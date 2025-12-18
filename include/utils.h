@@ -3,12 +3,12 @@
 
 #include "matrix.h"
 
-struct HSSNode {
+struct HODLRNode {
     int id;
     int idx_start, idx_end; 
     bool is_leaf;
-    HSSNode *left = nullptr;
-    HSSNode *right = nullptr;
+    HODLRNode *left = nullptr;
+    HODLRNode *right = nullptr;
 
     // Generators
     Matrix D; // Diagonal Block (Leaf only)
@@ -25,7 +25,7 @@ struct HSSNode {
     Matrix B_12; 
     Matrix B_21;
 
-    HSSNode() : is_leaf(false) {}
+    HODLRNode() : is_leaf(false) {}
 };
 
 #endif

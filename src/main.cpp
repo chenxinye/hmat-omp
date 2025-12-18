@@ -5,8 +5,8 @@
 #include <cmath>
 #include <omp.h>
 
-#include "../include/hss_routines.h"      // Serial (Optimized RSVD + Woodbury)
-#include "../include/hss_routines_omp.h"  // Parallel (Optimized RSVD + Woodbury)
+#include "../include/hodlr_routines.h"      // Serial (Optimized RSVD + Woodbury)
+#include "../include/hodlr_routines_omp.h"  // Parallel (Optimized RSVD + Woodbury)
 #include "../include/kernel.h"            
 
 using namespace std;
@@ -40,7 +40,7 @@ int main() {
     double tol = 1e-6;     
     
     std::cout << "==========================================================" << std::endl;
-    std::cout << " HSS Final Benchmark: Serial vs Parallel" << std::endl;
+    std::cout << " HODLR Final Benchmark: Serial vs Parallel" << std::endl;
     std::cout << " Matrix: " << N << "x" << N << " (Cauchy)" << std::endl;
     std::cout << " Max Threads: " << omp_get_max_threads() << std::endl;
     std::cout << "==========================================================" << std::endl;
@@ -64,44 +64,44 @@ int main() {
     
     std::cout << " GEMV: " << t_blas_mv << "s | Solve: " << t_blas_solve << "s" << std::endl;
 
-    // --- 2. Serial HSS ---
-    std::cout << "\n--- [2] Serial HSS (RSVD + Woodbury) ---" << std::endl;
-    HSSMatrix hss_serial(tol);
+    // --- 2. Serial HODLR ---
+    std::cout << "\n--- [2] Serial HODLR (RSVD + Woodbury) ---" << std::endl;
+    HODLRMatrix hodlr_serial(tol);
 
     t.reset();
-    hss_serial.build_from_dense(A, leaf_size);
+    hodlr_serial.build_from_dense(A, leaf_size);
     double t_serial_build = t.elapsed();
     std::cout << " Build: " << t_serial_build << "s" << std::endl;
 
     t.reset();
-    Matrix y_serial = hss_serial.multiply(x_true);
+    Matrix y_serial = hodlr_serial.multiply(x_true);
     double t_serial_mv = t.elapsed();
     double err_serial_mv = calc_rel_error(b, y_serial);
     std::cout << " GEMV:  " << t_serial_mv << "s | Err: " << err_serial_mv << std::endl;
 
     t.reset();
-    Matrix x_serial = hss_serial.solve(b);
+    Matrix x_serial = hodlr_serial.solve(b);
     double t_serial_solve = t.elapsed();
     double err_serial_solve = calc_rel_error(x_true, x_serial);
     std::cout << " Solve: " << t_serial_solve << "s | Err: " << err_serial_solve << std::endl;
 
-    // --- 3. Parallel HSS ---
-    std::cout << "\n--- [3] Parallel HSS (RSVD + Woodbury + OpenMP) ---" << std::endl;
-    HSSMatrixOMP hss_omp(tol);
+    // --- 3. Parallel HODLR ---
+    std::cout << "\n--- [3] Parallel HODLR (RSVD + Woodbury + OpenMP) ---" << std::endl;
+    HODLRMatrixOMP hodlr_omp(tol);
 
     t.reset();
-    hss_omp.build_from_dense(A, leaf_size);
+    hodlr_omp.build_from_dense(A, leaf_size);
     double t_omp_build = t.elapsed();
     std::cout << " Build: " << t_omp_build << "s" << std::endl;
 
     t.reset();
-    Matrix y_omp = hss_omp.multiply(x_true);
+    Matrix y_omp = hodlr_omp.multiply(x_true);
     double t_omp_mv = t.elapsed();
     double err_omp_mv = calc_rel_error(b, y_omp);
     std::cout << " GEMV:  " << t_omp_mv << "s | Err: " << err_omp_mv << std::endl;
 
     t.reset();
-    Matrix x_omp = hss_omp.solve(b);
+    Matrix x_omp = hodlr_omp.solve(b);
     double t_omp_solve = t.elapsed();
     double err_omp_solve = calc_rel_error(x_true, x_omp);
     std::cout << " Solve: " << t_omp_solve << "s | Err: " << err_omp_solve << std::endl;
@@ -111,7 +111,7 @@ int main() {
     std::cout << ">>> Speedup Analysis <<<" << std::endl;
     std::cout << "Build Parallel Speedup: " << std::fixed << std::setprecision(2) << t_serial_build / t_omp_build << "x" << std::endl;
     std::cout << "Solve Parallel Speedup: " << t_serial_solve / t_omp_solve << "x" << std::endl;
-    std::cout << "HSS Solve vs BLAS (Speedup): " << t_blas_solve / t_omp_solve << "x" << std::endl;
+    std::cout << "HODLR Solve vs BLAS (Speedup): " << t_blas_solve / t_omp_solve << "x" << std::endl;
     std::cout << "==========================================================" << std::endl;
 
     return 0;

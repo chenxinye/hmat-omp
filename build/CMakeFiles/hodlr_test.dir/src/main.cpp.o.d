@@ -1,4 +1,5 @@
-CMakeFiles/hss_test.dir/src/main.cpp.o: /Users/chenxinye/hss/src/main.cpp \
+CMakeFiles/hodlr_test.dir/src/main.cpp.o: \
+  /Users/chenxinye/hss/src/main.cpp \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/usr/include/c++/v1/iostream \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/usr/include/c++/v1/__assert \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/usr/include/c++/v1/__assertion_handler \
@@ -974,7 +975,7 @@ CMakeFiles/hss_test.dir/src/main.cpp.o: /Users/chenxinye/hss/src/main.cpp \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/usr/include/c++/v1/forward_list \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/usr/include/c++/v1/iomanip \
   /opt/homebrew/opt/libomp/include/omp.h \
-  /Users/chenxinye/hss/src/../include/hss_routines.h \
+  /Users/chenxinye/hss/src/../include/hodlr_routines.h \
   /Users/chenxinye/hss/src/../include/utils.h \
   /Users/chenxinye/hss/src/../include/matrix.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/usr/include/c++/v1/cassert \
@@ -1030,5 +1031,5 @@ CMakeFiles/hss_test.dir/src/main.cpp.o: /Users/chenxinye/hss/src/main.cpp \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/usr/include/c++/v1/__random/seed_seq.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/usr/include/c++/v1/__random/student_t_distribution.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/usr/include/c++/v1/__random/weibull_distribution.h \
-  /Users/chenxinye/hss/src/../include/hss_routines_omp.h \
+  /Users/chenxinye/hss/src/../include/hodlr_routines_omp.h \
   /Users/chenxinye/hss/src/../include/kernel.h

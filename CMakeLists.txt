@@ -24,14 +24,14 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 set(SOURCES src/main.cpp)
 
-add_executable(hss_test ${SOURCES})
+add_executable(hodlr_test ${SOURCES})
 
 if(BLAS_FOUND AND LAPACK_FOUND)
-    target_link_libraries(hss_test PRIVATE ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
+    target_link_libraries(hodlr_test PRIVATE ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 endif()
 
 if(OpenMP_CXX_FOUND)
-    target_link_libraries(hss_test PRIVATE OpenMP::OpenMP_CXX)
+    target_link_libraries(hodlr_test PRIVATE OpenMP::OpenMP_CXX)
 elseif(APPLE)
-    target_link_libraries(hss_test PRIVATE omp)
+    target_link_libraries(hodlr_test PRIVATE omp)
 endif()

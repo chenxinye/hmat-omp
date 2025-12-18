@@ -65,7 +65,7 @@ namespace Kernels {
     }
 
     // 3. Coulomb / Laplace Kernel: A_ij = 1 / |x_i - x_j|
-    // Slow decay, harder to compress than Gaussian, but valid for HSS.
+    // Slow decay, harder to compress than Gaussian, but valid for HODLR.
     inline Matrix generate_coulomb(int N, double diagonal_shift = 0.0) {
         Matrix A(N, N);
         std::vector<double> x = generate_grid(N);
