@@ -972,6 +972,7 @@ CMakeFiles/hss_test.dir/src/main.cpp.o: /Users/chenxinye/hss/src/main.cpp \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/usr/include/c++/v1/__chrono/year_month_weekday.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/usr/include/c++/v1/__chrono/literals.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/usr/include/c++/v1/forward_list \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/usr/include/c++/v1/iomanip \
   /Users/chenxinye/hss/src/../include/hss_routines.h \
   /Users/chenxinye/hss/src/../include/utils.h \
   /Users/chenxinye/hss/src/../include/matrix.h \
@@ -979,4 +980,6 @@ CMakeFiles/hss_test.dir/src/main.cpp.o: /Users/chenxinye/hss/src/main.cpp \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/usr/include/assert.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/usr/include/_assert.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/usr/include/_static_assert.h \
-  /Users/chenxinye/hss/src/../include/compression.h
+  /Users/chenxinye/hss/src/../include/compression.h \
+  /Users/chenxinye/hss/src/../include/hss_routines_omp.h \
+  /opt/homebrew/opt/libomp/include/omp.h
