@@ -982,4 +982,5 @@ CMakeFiles/hss_test.dir/src/main.cpp.o: /Users/chenxinye/hss/src/main.cpp \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/usr/include/_static_assert.h \
   /Users/chenxinye/hss/src/../include/compression.h \
   /Users/chenxinye/hss/src/../include/hss_routines_omp.h \
-  /opt/homebrew/opt/libomp/include/omp.h
+  /opt/homebrew/opt/libomp/include/omp.h \
+  /Users/chenxinye/hss/src/../include/kernel.h
