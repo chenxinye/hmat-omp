@@ -1,4 +1,4 @@
-# hss: Computing routines for hierarchically semiseparable matrices
+# hss: hierarchically semiseparable matrices
 
 
 
