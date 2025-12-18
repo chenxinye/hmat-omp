@@ -92,7 +92,7 @@ hss_bench_EXTERNAL_OBJECTS =
 
 hss_bench: CMakeFiles/hss_bench.dir/src/main.cpp.o
 hss_bench: CMakeFiles/hss_bench.dir/build.make
-hss_bench: /opt/homebrew/opt/libomp/lib/libomp.dylib
+hss_bench: /opt/homebrew/opt/llvm/lib/libomp.dylib
 hss_bench: CMakeFiles/hss_bench.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/chenxinye/hss/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable hss_bench"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/hss_bench.dir/link.txt --verbose=$(VERBOSE)

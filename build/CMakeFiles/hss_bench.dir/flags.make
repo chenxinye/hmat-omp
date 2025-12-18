@@ -4,9 +4,9 @@
 # compile CXX with /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/Users/chenxinye/hss/include -F/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks -isystem /opt/homebrew/opt/libomp/include
+CXX_INCLUDES = -I/opt/homebrew/opt/libomp/include -I/Users/chenxinye/hss/include -F/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks
 
-CXX_FLAGSarm64 = -std=gnu++14 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk -Xclang -fopenmp
+CXX_FLAGSarm64 =  -Xpreprocessor -fopenmp -I/opt/homebrew/opt/libomp/include -std=gnu++14 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk -Xclang -fopenmp
 
-CXX_FLAGS = -std=gnu++14 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk -Xclang -fopenmp
+CXX_FLAGS =  -Xpreprocessor -fopenmp -I/opt/homebrew/opt/libomp/include -std=gnu++14 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk -Xclang -fopenmp
 

@@ -37,9 +37,9 @@ double calc_rel_error(const Matrix& ref, const Matrix& res) {
 
 int main() {
     // Configuration
-    int N = 2048;          // Matrix Dimension (Increase to see OMP benefits)
-    int leaf_size = 256;   // Block size
-    double tol = 1e-6;     // Compression tolerance
+    int N = 2048 * 2;          // Matrix Dimension (Increase to see OMP benefits)
+    int leaf_size = 256 * 2;   // Block size
+    double tol = 1e-8;     // Compression tolerance
 
     std::cout << "==========================================================" << std::endl;
     std::cout << " HSS Benchmark: BLAS vs Serial vs OpenMP" << std::endl;

@@ -92,7 +92,7 @@ hss_test_EXTERNAL_OBJECTS =
 
 hss_test: CMakeFiles/hss_test.dir/src/main.cpp.o
 hss_test: CMakeFiles/hss_test.dir/build.make
-hss_test: /opt/homebrew/opt/libomp/lib/libomp.dylib
+hss_test: /opt/homebrew/opt/llvm/lib/libomp.dylib
 hss_test: CMakeFiles/hss_test.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/chenxinye/hss/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable hss_test"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/hss_test.dir/link.txt --verbose=$(VERBOSE)
