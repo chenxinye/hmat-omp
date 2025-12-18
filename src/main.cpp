@@ -3,14 +3,14 @@
 #include <iomanip>
 #include <vector>
 #include <cmath>
+#include <omp.h>
 
-#include "../include/hss_routines.h"      // Serial
-#include "../include/hss_routines_omp.h"  // Parallel (OpenMP)
-#include "../include/kernel.h"            // Kernel Matrices
+#include "../include/hss_routines.h"      // Serial (Optimized RSVD + Woodbury)
+#include "../include/hss_routines_omp.h"  // Parallel (Optimized RSVD + Woodbury)
+#include "../include/kernel.h"            
 
 using namespace std;
 
-// --- Timer Utility ---
 class Timer {
     using clock_t = std::chrono::high_resolution_clock;
     std::chrono::time_point<clock_t> start_time;
@@ -23,10 +23,8 @@ public:
     void reset() { start_time = clock_t::now(); }
 };
 
-// --- Helper for Relative Error ---
 double calc_rel_error(const Matrix& ref, const Matrix& res) {
-    double num = 0.0;
-    double den = 0.0;
+    double num = 0.0, den = 0.0;
     for(int i=0; i<ref.rows() * ref.cols(); ++i) {
         double d = ref.data()[i] - res.data()[i];
         num += d*d;
@@ -37,122 +35,84 @@ double calc_rel_error(const Matrix& ref, const Matrix& res) {
 }
 
 int main() {
-    // ==========================================
-    // CONFIGURATION
-    // ==========================================
-    int N = 4096;           // Matrix Dimension (Needs to be large for HSS to win)
-    int leaf_size = 256;    // Block size
-    double tol = 1e-12;      // Compression tolerance
-    
-    // Choose Kernel: CAUCHY, GAUSSIAN, COULOMB
-    Kernels::Type kernel_type = Kernels::CAUCHY; 
-    string kernel_name = "Cauchy";
-
-    // ==========================================
+    int N = 4096;          
+    int leaf_size = 256;   
+    double tol = 1e-6;     
     
     std::cout << "==========================================================" << std::endl;
-    std::cout << " HSS Benchmark: BLAS vs Serial vs OpenMP" << std::endl;
-    std::cout << " Matrix Type: " << kernel_name << " (Low-rank off-diagonals)" << std::endl;
-    std::cout << " N = " << N << ", Leaf Size = " << leaf_size << ", Tol = " << tol << std::endl;
-    #ifdef _OPENMP
-    std::cout << " OpenMP Enabled. Max Threads: " << omp_get_max_threads() << std::endl;
-    #else
-    std::cout << " OpenMP DISABLED." << std::endl;
-    #endif
-    std::cout << "==========================================================\n" << std::endl;
+    std::cout << " HSS Final Benchmark: Serial vs Parallel" << std::endl;
+    std::cout << " Matrix: " << N << "x" << N << " (Cauchy)" << std::endl;
+    std::cout << " Max Threads: " << omp_get_max_threads() << std::endl;
+    std::cout << "==========================================================" << std::endl;
 
-    // 1. Generate Data-Sparse Matrix
-    std::cout << "[Init] Generating Kernel Matrix..." << std::endl;
-    Matrix A = Kernels::generate_matrix(kernel_type, N);
-    
-    // RHS Vector
+    std::cout << "\n>>> Generating Matrix..." << std::endl;
+    Matrix A = Kernels::generate_matrix(Kernels::CAUCHY, N);
     Matrix x_true = Matrix::Random(N, 1);
-    Matrix b = A * x_true; // b = A * x_true
+    Matrix b = A * x_true;
 
-    // ---------------------------------------------------------
-    // BASELINE: BLAS / LAPACK
-    // ---------------------------------------------------------
-    std::cout << "--- [1] Baseline: BLAS / LAPACK Dense ---" << std::endl;
+    // --- 1. BLAS Baseline ---
+    std::cout << "\n--- [1] Baseline: BLAS Dense ---" << std::endl;
     Timer t;
-    
-    // GEMV Baseline
     Matrix b_blas = A * x_true; 
-    double time_blas_gemv = t.elapsed();
-    std::cout << "  GEMV Time:   " << std::fixed << std::setprecision(6) << time_blas_gemv << " s" << std::endl;
-
-    // Solver Baseline (LU)
-    // We work on a copy because solve_lu is in-place
+    double t_blas_mv = t.elapsed();
+    
     Matrix A_dense = A; 
     Matrix x_blas = b; 
-    
     t.reset();
-    A_dense.solve_lu(x_blas); 
-    double time_blas_solve = t.elapsed();
+    A_dense.solve_lu(x_blas);
+    double t_blas_solve = t.elapsed();
     
-    std::cout << "  Solve Time:  " << std::setw(10) << time_blas_solve << " s" << std::endl;
-    std::cout << "  Error (L2):  " << std::scientific << calc_rel_error(x_true, x_blas) << std::endl;
-    std::cout << std::endl;
+    std::cout << " GEMV: " << t_blas_mv << "s | Solve: " << t_blas_solve << "s" << std::endl;
 
-    // ---------------------------------------------------------
-    // SERIAL HSS
-    // ---------------------------------------------------------
-    std::cout << "--- [2] Serial HSS Implementation ---" << std::endl;
+    // --- 2. Serial HSS ---
+    std::cout << "\n--- [2] Serial HSS (RSVD + Woodbury) ---" << std::endl;
     HSSMatrix hss_serial(tol);
-    
-    // Build
+
     t.reset();
     hss_serial.build_from_dense(A, leaf_size);
-    double time_serial_build = t.elapsed();
-    std::cout << "  Build Time:  " << std::fixed << std::setprecision(6) << time_serial_build << " s" << std::endl;
+    double t_serial_build = t.elapsed();
+    std::cout << " Build: " << t_serial_build << "s" << std::endl;
 
-    // GEMV
     t.reset();
     Matrix y_serial = hss_serial.multiply(x_true);
-    double time_serial_gemv = t.elapsed();
-    double err_serial_gemv = calc_rel_error(b, y_serial);
-    std::cout << "  GEMV Time:   " << std::setw(10) << time_serial_gemv << " s | Err: " << err_serial_gemv << std::endl;
+    double t_serial_mv = t.elapsed();
+    double err_serial_mv = calc_rel_error(b, y_serial);
+    std::cout << " GEMV:  " << t_serial_mv << "s | Err: " << err_serial_mv << std::endl;
 
-    // Solve (Preconditioner/Approx)
     t.reset();
-    Matrix x_serial_sol = hss_serial.solve(b);
-    double time_serial_solve = t.elapsed();
-    double err_serial_solve = calc_rel_error(x_true, x_serial_sol); 
-    std::cout << "  Solve Time:  " << std::setw(10) << time_serial_solve << " s | Err: " << err_serial_solve << std::endl;
-    std::cout << std::endl;
+    Matrix x_serial = hss_serial.solve(b);
+    double t_serial_solve = t.elapsed();
+    double err_serial_solve = calc_rel_error(x_true, x_serial);
+    std::cout << " Solve: " << t_serial_solve << "s | Err: " << err_serial_solve << std::endl;
 
-    // ---------------------------------------------------------
-    // PARALLEL HSS (OpenMP)
-    // ---------------------------------------------------------
-    std::cout << "--- [3] Parallel HSS (Level-by-Level OpenMP) ---" << std::endl;
+    // --- 3. Parallel HSS ---
+    std::cout << "\n--- [3] Parallel HSS (RSVD + Woodbury + OpenMP) ---" << std::endl;
     HSSMatrixOMP hss_omp(tol);
 
-    // Build
     t.reset();
     hss_omp.build_from_dense(A, leaf_size);
-    double time_omp_build = t.elapsed();
-    
-    std::cout << "  Build Time:  " << std::fixed << std::setprecision(6) << time_omp_build << " s";
-    std::cout << " [Speedup vs Serial: " << std::fixed << std::setprecision(2) << time_serial_build / time_omp_build << "x]" << std::endl;
+    double t_omp_build = t.elapsed();
+    std::cout << " Build: " << t_omp_build << "s" << std::endl;
 
-    // GEMV
     t.reset();
     Matrix y_omp = hss_omp.multiply(x_true);
-    double time_omp_gemv = t.elapsed();
-    double err_omp_gemv = calc_rel_error(b, y_omp);
-    std::cout << "  GEMV Time:   " << std::setw(10) << time_omp_gemv << " s";
-    std::cout << " [Speedup vs Serial: " << std::fixed << std::setprecision(2) << time_serial_gemv / time_omp_gemv << "x]";
-    std::cout << " | Err: " << std::scientific << err_omp_gemv << std::endl;
+    double t_omp_mv = t.elapsed();
+    double err_omp_mv = calc_rel_error(b, y_omp);
+    std::cout << " GEMV:  " << t_omp_mv << "s | Err: " << err_omp_mv << std::endl;
 
-    // Solve
     t.reset();
-    Matrix x_omp_sol = hss_omp.solve(b);
-    double time_omp_solve = t.elapsed();
-    double err_omp_solve = calc_rel_error(x_true, x_omp_sol);
-    std::cout << "  Solve Time:  " << std::setw(10) << time_omp_solve << " s";
-    std::cout << " [Speedup vs Serial: " << std::fixed << std::setprecision(2) << time_serial_solve / time_omp_solve << "x]";
-    std::cout << " | Err: " << std::scientific << err_omp_solve << std::endl;
-
-    std::cout << "\n==========================================================" << std::endl;
+    Matrix x_omp = hss_omp.solve(b);
+    double t_omp_solve = t.elapsed();
+    double err_omp_solve = calc_rel_error(x_true, x_omp);
+    std::cout << " Solve: " << t_omp_solve << "s | Err: " << err_omp_solve << std::endl;
     
+    // --- Summary ---
+    std::cout << "\n==========================================================" << std::endl;
+    std::cout << ">>> Speedup Analysis <<<" << std::endl;
+    std::cout << "Build Parallel Speedup: " << std::fixed << std::setprecision(2) << t_serial_build / t_omp_build << "x" << std::endl;
+    std::cout << "Solve Parallel Speedup: " << t_serial_solve / t_omp_solve << "x" << std::endl;
+    std::cout << "HSS Solve vs BLAS (Speedup): " << t_blas_solve / t_omp_solve << "x" << std::endl;
+    std::cout << "==========================================================" << std::endl;
+
     return 0;
 }

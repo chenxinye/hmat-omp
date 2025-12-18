@@ -3,178 +3,176 @@
 
 #include "utils.h"
 #include "compression.h"
-#include <stack>
 #include <vector>
 
 class HSSMatrix {
 public:
     HSSNode* root;
     std::vector<HSSNode*> nodes;
-    
-    // Stack-based traversal orders (Non-recursive)
-    std::vector<HSSNode*> stack_post_order; // Bottom-Up (Leaves -> Root)
-    std::vector<HSSNode*> stack_pre_order;  // Top-Down (Root -> Leaves)
-    
     int N;
     double tolerance;
+    int rsvd_rank;
 
-    HSSMatrix(double tol = 1e-6) : root(nullptr), N(0), tolerance(tol) {}
-    
-    ~HSSMatrix() { 
-        for(auto n : nodes) delete n; 
-    }
+    HSSMatrix(double tol = 1e-6) : root(nullptr), N(0), tolerance(tol), rsvd_rank(64) {}
+    ~HSSMatrix() { for(auto n : nodes) delete n; }
 
-    // *****************************************
-    // 1. Construction Logic
-    // *****************************************
+    //  Serial Build (Using Fast RSVD) 
     void build_from_dense(const Matrix& A, int leaf_size) {
         N = A.rows();
         root = new HSSNode();
         nodes.push_back(root);
-        
-        // 1.1 Topology
-        build_topology(root, 0, N, leaf_size);
-        generate_orders();
-        
-        // 1.2 Compression (Bottom-Up)
-        for (HSSNode* node : stack_post_order) {
-            int start = node->idx_start;
-            int len = node->idx_end - node->idx_start;
-
-            if (node->is_leaf) {
-                // Diagonal block
-                node->D = A.block(start, start, len, len);
-
-                // Off-diagonal extraction
-                // Mask diagonal block to 0 for compression
-                Matrix RowBlock = A.block(start, 0, len, N);
-                Matrix ColBlockT = A.block(0, start, N, len).transpose();
-                
-                for(int j=0; j<len; ++j) {
-                    for(int i=0; i<len; ++i) {
-                        RowBlock(i, start+j) = 0.0;
-                        ColBlockT(i, start+j) = 0.0;
-                    }
-                }
-
-                auto lr_U = Compression::compress_svd(RowBlock, tolerance);
-                auto lr_V = Compression::compress_svd(ColBlockT, tolerance);
-
-                node->U = lr_U.U;
-                node->V = lr_V.U; 
-            } else {
-                // Merge Children
-                HSSNode* lc = node->left;
-                HSSNode* rc = node->right;
-                
-                int rl = lc->U.cols();
-                int rr = rc->U.cols();
-                int r_total = rl + rr;
-
-                // Simplified merge (Identity Transfer)
-                // Real implementation would recompress [U_left, 0; 0, U_right]
-                node->B = Matrix::Identity(r_total, r_total); 
-                node->U = Matrix::Identity(r_total, r_total);
-                node->V = Matrix::Identity(r_total, r_total);
-            }
-        }
+        build_recursive(root, A, 0, N, leaf_size);
     }
 
-    // *****************************************
-    // 2. Matrix-Vector Multiplication (Fast GEMV)
-    // *****************************************
-    Matrix multiply(const Matrix& x_vec) {
-        std::vector<Matrix> g(nodes.size()); 
-        Matrix y(N, 1);
-
-        // Upward Pass
-        for (HSSNode* node : stack_post_order) {
-            if (node->is_leaf) {
-                Matrix x_loc = x_vec.block(node->idx_start, 0, node->idx_end - node->idx_start, 1);
-                g[node->id] = node->V.transpose() * x_loc;
-            } else {
-                Matrix g_l = g[node->left->id];
-                Matrix g_r = g[node->right->id];
-                // Stack children vectors
-                Matrix g_stack(g_l.rows() + g_r.rows(), 1);
-                g_stack.set_block(0, 0, g_l);
-                g_stack.set_block(g_l.rows(), 0, g_r);
-                g[node->id] = g_stack; // Apply B here in full version
-            }
-        }
-
-        // Downward Pass (omitted for brevity, typically computes 'f')
-        // ...
-
-        // Local Calculation (Diagonal)
-        for (HSSNode* node : stack_post_order) {
-            if (node->is_leaf) {
-                int len = node->idx_end - node->idx_start;
-                Matrix x_loc = x_vec.block(node->idx_start, 0, len, 1);
-                Matrix res = node->D * x_loc;
-                y.set_block(node->idx_start, 0, res);
-            }
-        }
-        return y;
-    }
-
-    // *****************************************
-    // 3. Solver (ULV / LU Wrapper)
-    // *****************************************
-    // A simplified solver that treats diagonal blocks with dense LU
-    Matrix solve(const Matrix& b) {
-        Matrix x = b; 
-        
-        // Very simplified Block-Jacobi preconditioner style for demo
-        // (Real HSS solver requires full ULV forward/backward)
-        for (HSSNode* node : stack_post_order) {
-            if (node->is_leaf) {
-                int start = node->idx_start;
-                int len = node->idx_end - node->idx_start;
-                Matrix b_loc = x.block(start, 0, len, 1);
-                
-                // Solve locally using LU
-                Matrix D_copy = node->D;
-                D_copy.solve_lu(b_loc); 
-                
-                x.set_block(start, 0, b_loc);
-            }
-        }
-        return x;
-    }
-
-private:
-    void build_topology(HSSNode* node, int start, int end, int leaf_size) {
+    void build_recursive(HSSNode* node, const Matrix& A, int start, int end, int leaf_size) {
         node->idx_start = start;
         node->idx_end = end;
-        node->id = nodes.size() - 1;
-        if ((end - start) <= leaf_size) {
+        int len = end - start;
+
+        if (len <= leaf_size) {
             node->is_leaf = true;
+            node->D = A.block(start, start, len, len);
         } else {
+            node->is_leaf = false;
             int mid = (start + end) / 2;
-            node->left = new HSSNode(); nodes.push_back(node->left);
-            build_topology(node->left, start, mid, leaf_size);
-            node->right = new HSSNode(); nodes.push_back(node->right);
-            build_topology(node->right, mid, end, leaf_size);
+            
+            node->left = new HSSNode(); 
+            node->right = new HSSNode();
+            
+            // Recursive calls (Serial)
+            build_recursive(node->left, A, start, mid, leaf_size);
+            build_recursive(node->right, A, mid, end, leaf_size);
+            
+            // Off-Diagonal Compression (Same RSVD logic as OMP version)
+            int len_l = mid - start;
+            int len_r = end - mid;
+            Matrix A12 = A.block(start, mid, len_l, len_r);
+            Matrix A21 = A.block(mid, start, len_r, len_l);
+            
+            auto lr_12 = Compression::compress_rsvd(A12, tolerance, rsvd_rank);
+            auto lr_21 = Compression::compress_rsvd(A21, tolerance, rsvd_rank);
+            
+            node->left->U = lr_12.U;
+            node->right->V = lr_12.V;
+            node->B_12 = lr_12.B;
+
+            node->right->U = lr_21.U;
+            node->left->V = lr_21.V;
+            node->B_21 = lr_21.B;
         }
     }
 
-    void generate_orders() {
-        stack_post_order.clear();
-        std::stack<HSSNode*> s;
-        std::stack<HSSNode*> out;
-        if(root) s.push(root);
-        while (!s.empty()) {
-            HSSNode* curr = s.top(); s.pop();
-            out.push(curr);
-            if (curr->left) s.push(curr->left);
-            if (curr->right) s.push(curr->right);
+    //  Serial Multiply 
+    Matrix multiply(const Matrix& x) {
+        return mult_recursive(root, x);
+    }
+
+    Matrix mult_recursive(HSSNode* node, const Matrix& x_global) {
+        int start = node->idx_start;
+        int len = node->idx_end - node->idx_start;
+        
+        if (node->is_leaf) {
+            Matrix x_loc = x_global.block(start, 0, len, 1);
+            return node->D * x_loc;
+        } else {
+            int mid = (node->idx_start + node->idx_end) / 2;
+            int len_l = mid - node->idx_start;
+            
+            // Recursive calls (Serial)
+            Matrix y_l = mult_recursive(node->left, x_global);
+            Matrix y_r = mult_recursive(node->right, x_global);
+            
+            Matrix x_loc = x_global.block(start, 0, len, 1);
+            Matrix x_l = x_loc.block(0, 0, len_l, 1);
+            Matrix x_r = x_loc.block(len_l, 0, len - len_l, 1);
+            
+            Matrix t1 = node->right->V.transpose() * x_r;
+            Matrix t2 = node->B_12 * t1; 
+            Matrix term_l = node->left->U * t2; 
+            
+            Matrix t3 = node->left->V.transpose() * x_l;
+            Matrix t4 = node->B_21 * t3;
+            Matrix term_r = node->right->U * t4;
+
+            for(int i=0; i<y_l.rows(); ++i) y_l(i,0) += term_l(i,0);
+            for(int i=0; i<y_r.rows(); ++i) y_r(i,0) += term_r(i,0);
+            
+            Matrix y(len, 1);
+            y.set_block(0, 0, y_l);
+            y.set_block(len_l, 0, y_r);
+            return y;
         }
-        while (!out.empty()) {
-            stack_post_order.push_back(out.top());
-            out.pop();
+    }
+
+    //  Serial Solver (Woodbury) 
+    Matrix solve(const Matrix& b) {
+        return solve_woodbury(root, b);
+    }
+
+    Matrix solve_woodbury(HSSNode* node, const Matrix& b_loc) {
+        int cols = b_loc.cols();
+        if (node->is_leaf) {
+            Matrix x = b_loc;
+            Matrix D_inv = node->D; 
+            D_inv.solve_lu(x); 
+            return x;
+        } else {
+            int mid = (node->idx_start + node->idx_end) / 2;
+            int len_l = mid - node->idx_start;
+            int len_r = node->idx_end - mid;
+            
+            Matrix b1 = b_loc.block(0, 0, len_l, cols);
+            Matrix b2 = b_loc.block(len_l, 0, len_r, cols);
+            
+            // Recursive calls (Serial)
+            Matrix z1 = solve_woodbury(node->left, b1);
+            Matrix z2 = solve_woodbury(node->right, b2);
+            
+            Matrix vt_z_1 = node->right->V.transpose() * z2; 
+            Matrix vt_z_2 = node->left->V.transpose() * z1;  
+            
+            Matrix U1 = node->left->U;
+            Matrix U2 = node->right->U;
+            
+            Matrix Q1 = solve_woodbury(node->left, U1);
+            Matrix Q2 = solve_woodbury(node->right, U2);
+            
+            int r1 = node->B_12.rows();
+            int r2 = node->B_21.rows();
+            int R = r1 + r2;
+            Matrix C(R, R); C.setZero();
+            
+            Matrix B12_inv = node->B_12.inverse();
+            Matrix B21_inv = node->B_21.inverse();
+            C.set_block(0, 0, B12_inv);
+            C.set_block(r1, r1, B21_inv);
+            
+            Matrix TR = node->right->V.transpose() * Q2;
+            C.set_block(0, r1, TR);
+            
+            Matrix BL = node->left->V.transpose() * Q1;
+            C.set_block(r1, 0, BL);
+            
+            Matrix rhs_cap(R, cols);
+            rhs_cap.set_block(0, 0, vt_z_1);
+            rhs_cap.set_block(r1, 0, vt_z_2);
+            
+            C.solve_lu(rhs_cap); 
+            
+            Matrix g1 = rhs_cap.block(0, 0, r1, cols);
+            Matrix g2 = rhs_cap.block(r1, 0, r2, cols);
+            
+            Matrix corr1 = Q1 * g1;
+            Matrix corr2 = Q2 * g2;
+            
+            Matrix x(b_loc.rows(), cols);
+            for(int j=0; j<cols; ++j) {
+                for(int i=0; i<len_l; ++i) x(i,j) = z1(i,j) - corr1(i,j);
+                for(int i=0; i<len_r; ++i) x(len_l+i,j) = z2(i,j) - corr2(i,j);
+            }
+            return x;
         }
     }
 };
 
-#endif // HSS_ROUTINES_H
+#endif

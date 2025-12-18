@@ -3,29 +3,29 @@
 
 #include "matrix.h"
 
-//  HSS Tree Node Structure 
 struct HSSNode {
     int id;
-    int idx_start, idx_end; // Global indices range
+    int idx_start, idx_end; 
     bool is_leaf;
-    
-    // Tree Pointers
     HSSNode *left = nullptr;
     HSSNode *right = nullptr;
-    HSSNode *parent = nullptr;
 
-    //  HSS Generators 
-    Matrix D; // Diagonal block (Leaf only)
-    Matrix U; // Row basis
-    Matrix V; // Column basis 
-    Matrix B; // Translation operator
+    // Generators
+    Matrix D; // Diagonal Block (Leaf only)
+    
+    // Off-Diagonal Interaction: 
+    // Top-Right Block A12 approx U_L * B_12 * V_R^T
+    // Bottom-Left Block A21 approx U_R * B_21 * V_L^T
+    
+    // Bases stored at nodes
+    Matrix U; // Row Basis
+    Matrix V; // Col Basis
 
-    //  Factorization Data (ULV) 
-    Matrix Q; // Orthogonal factors
-    Matrix L; // Reduced/Triangular factors
-    Matrix W; // Merge buffer (Schur complement)
+    // Coupling Matrices (Scaling Factors)
+    Matrix B_12; 
+    Matrix B_21;
 
     HSSNode() : is_leaf(false) {}
 };
 
-#endif // UTILS_H
+#endif
