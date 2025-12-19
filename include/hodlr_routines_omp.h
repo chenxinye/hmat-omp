@@ -78,7 +78,6 @@ public:
         }
     }
 
-    //  Parallel Multiply 
     Matrix multiply(const Matrix& x) {
         Matrix res;
         #pragma omp parallel
@@ -135,7 +134,6 @@ public:
         }
     }
 
-    //  Solver (Woodbury) 
     Matrix solve(const Matrix& b) {
         Matrix x;
         #pragma omp parallel
@@ -147,7 +145,6 @@ public:
     }
 
     Matrix solve_woodbury(HODLRNode* node, const Matrix& b_loc) {
-        //  FIX: Dynamic column size detection 
         int cols = b_loc.cols(); 
 
         if (node->is_leaf) {
@@ -160,7 +157,6 @@ public:
             int len_l = mid - node->idx_start;
             int len_r = node->idx_end - mid;
             
-            //  FIX: Use 'cols' instead of 1 
             Matrix b1 = b_loc.block(0, 0, len_l, cols);
             Matrix b2 = b_loc.block(len_l, 0, len_r, cols);
             

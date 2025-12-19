@@ -7,7 +7,7 @@
 #include <cstring>
 #include <algorithm>
 #include <cassert>
-#include <random> // 必须引入，用于线程安全随机数
+#include <random> 
 
 // --- LAPACK / BLAS C Interface ---
 extern "C" {
@@ -47,10 +47,8 @@ public:
         return Matrix(r, c);
     }
 
-    // --- FIX: 线程安全的随机生成器 ---
     static Matrix Random(int r, int c) {
         Matrix M(r, c);
-        // 使用 thread_local 避免 OpenMP 竞争条件
         static thread_local std::mt19937 generator(std::random_device{}());
         std::uniform_real_distribution<double> distribution(0.0, 1.0);
         

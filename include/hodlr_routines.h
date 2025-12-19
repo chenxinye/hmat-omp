@@ -104,7 +104,7 @@ public:
         }
     }
 
-    //  Serial Solver (Woodbury) 
+
     Matrix solve(const Matrix& b) {
         return solve_woodbury(root, b);
     }

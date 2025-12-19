@@ -19,7 +19,7 @@ public:
     HSSMatrixOMP(double tol = 1e-9) : root(nullptr), N(0), tolerance(tol), rsvd_rank(64) {}
     ~HSSMatrixOMP() { for(auto n : nodes) delete n; }
 
-    // --- Helper: Task-based Reconstruction ---
+    // Task-based Reconstruction 
     Matrix reconstruct_U(HSSNode* node) {
         if (node->is_leaf) return node->U;
         
@@ -56,9 +56,9 @@ public:
         return V_big * node->W;
     }
 
-    // ========================================================
+    // ***********************************************************
     // 1. Build Phase (Parallelized)
-    // ========================================================
+    // ***********************************************************
     void build_from_dense(const Matrix& A, int leaf_size) {
         N = A.rows();
         nodes.clear();
@@ -148,9 +148,9 @@ public:
         }
     }
 
-    // ========================================================
+    // ***********************************************************
     // 2. Matrix-Vector Multiply
-    // ========================================================
+    // ***********************************************************
     Matrix multiply(const Matrix& x) {
         int num_nodes = nodes.size();
         std::vector<Matrix> g(num_nodes);
@@ -229,9 +229,9 @@ public:
         return y;
     }
 
-    // ========================================================
+    // ***********************************************************
     // 3. Solver (Task Parallel + Stable Formula)
-    // ========================================================
+    // ***********************************************************
     Matrix solve(const Matrix& b) {
         Matrix res;
         #pragma omp parallel
@@ -303,7 +303,7 @@ public:
         Q2 = solve_multi_rhs_internal(node->right, U_R_dense);
         #pragma omp taskwait // Wait for z1, z2, Q1, Q2
 
-        // --- STABLE CORRECTION STEP ---
+        //  STABLE CORRECTION STEP 
         // Formula: x = z - Q * B * (I + K*B)^-1 * V^T*z
         // Where K = V^T * Q
         
