@@ -1,0 +1,59 @@
+name: HSS/HODLR Benchmark CI
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. 拉取代码
+    - uses: actions/checkout@v3
+
+    # 2. 安装系统依赖
+    # Ubuntu 运行环境需要 BLAS 和 LAPACK 开发库
+    # CMake 和 编译器 (GCC) 通常已预装
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libblas-dev liblapack-dev
+
+    # 3. CMake 配置 (Configure)
+    # 创建 build 目录并生成构建系统
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release
+
+    # 4. 编译 (Build)
+    # 使用 cmake --build 自动调用 make，编译所有 targets (hss_test, hodlr_test)
+    - name: Build Executables
+      run: |
+        cd build
+        cmake --build . --config Release --parallel 2
+
+    # 5. 运行测试
+    # 关键：设置环境变量以防止 OpenMP 与 BLAS 线程冲突
+    - name: Run Benchmarks
+      env:
+        OPENBLAS_NUM_THREADS: 1
+        MKL_NUM_THREADS: 1
+        OMP_NUM_THREADS: 2
+      run: |
+        cd build
+        
+        echo "==========================================="
+        echo "Running HSS Benchmark"
+        echo "==========================================="
+        ./hss_test
+
+        echo -e "\n\n"
+        echo "==========================================="
+        echo "Running HODLR Benchmark"
+        echo "==========================================="
+        ./hodlr_test
