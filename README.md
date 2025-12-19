@@ -1,5 +1,7 @@
 # hmat-omp: hierarhical matrices with weak admissibility
 
+[![HSS/HODLR Benchmark CI](https://github.com/chenxinye/hmat-omp/actions/workflows/main.yml/badge.svg)](https://github.com/chenxinye/hmat-omp/actions/workflows/main.yml)
+
 A lightweight, high-performance C++ header-only library for Hierarchical OFF-Diagonal (HODLR) matrices and Hierarchically Semiseparable (HSS) Matrices. This library implements OpenMP-based parallelization and Randomized SVD to achieve orders-of-magnitude speedups over standard dense linear algebra (BLAS/LAPACK) for data-sparse problems (e.g., Cauchy, Gaussian, Coulomb kernels).
 
  Key FeaturesFast
