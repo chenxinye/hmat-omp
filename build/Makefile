@@ -129,29 +129,66 @@ hodlr_test/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/hodlr_test.dir/build.make CMakeFiles/hodlr_test.dir/build
 .PHONY : hodlr_test/fast
 
-src/main.o: src/main.cpp.o
-.PHONY : src/main.o
+#=============================================================================
+# Target rules for targets named hss_test
+
+# Build rule for target.
+hss_test: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 hss_test
+.PHONY : hss_test
+
+# fast build rule for target.
+hss_test/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hss_test.dir/build.make CMakeFiles/hss_test.dir/build
+.PHONY : hss_test/fast
+
+src/main_hodlr.o: src/main_hodlr.cpp.o
+.PHONY : src/main_hodlr.o
 
 # target to build an object file
-src/main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hodlr_test.dir/build.make CMakeFiles/hodlr_test.dir/src/main.cpp.o
-.PHONY : src/main.cpp.o
+src/main_hodlr.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hodlr_test.dir/build.make CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.o
+.PHONY : src/main_hodlr.cpp.o
 
-src/main.i: src/main.cpp.i
-.PHONY : src/main.i
+src/main_hodlr.i: src/main_hodlr.cpp.i
+.PHONY : src/main_hodlr.i
 
 # target to preprocess a source file
-src/main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hodlr_test.dir/build.make CMakeFiles/hodlr_test.dir/src/main.cpp.i
-.PHONY : src/main.cpp.i
+src/main_hodlr.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hodlr_test.dir/build.make CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.i
+.PHONY : src/main_hodlr.cpp.i
 
-src/main.s: src/main.cpp.s
-.PHONY : src/main.s
+src/main_hodlr.s: src/main_hodlr.cpp.s
+.PHONY : src/main_hodlr.s
 
 # target to generate assembly for a file
-src/main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/hodlr_test.dir/build.make CMakeFiles/hodlr_test.dir/src/main.cpp.s
-.PHONY : src/main.cpp.s
+src/main_hodlr.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hodlr_test.dir/build.make CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.s
+.PHONY : src/main_hodlr.cpp.s
+
+src/main_hss.o: src/main_hss.cpp.o
+.PHONY : src/main_hss.o
+
+# target to build an object file
+src/main_hss.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hss_test.dir/build.make CMakeFiles/hss_test.dir/src/main_hss.cpp.o
+.PHONY : src/main_hss.cpp.o
+
+src/main_hss.i: src/main_hss.cpp.i
+.PHONY : src/main_hss.i
+
+# target to preprocess a source file
+src/main_hss.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hss_test.dir/build.make CMakeFiles/hss_test.dir/src/main_hss.cpp.i
+.PHONY : src/main_hss.cpp.i
+
+src/main_hss.s: src/main_hss.cpp.s
+.PHONY : src/main_hss.s
+
+# target to generate assembly for a file
+src/main_hss.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/hss_test.dir/build.make CMakeFiles/hss_test.dir/src/main_hss.cpp.s
+.PHONY : src/main_hss.cpp.s
 
 # Help Target
 help:
@@ -162,9 +199,13 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... hodlr_test"
-	@echo "... src/main.o"
-	@echo "... src/main.i"
-	@echo "... src/main.s"
+	@echo "... hss_test"
+	@echo "... src/main_hodlr.o"
+	@echo "... src/main_hodlr.i"
+	@echo "... src/main_hodlr.s"
+	@echo "... src/main_hss.o"
+	@echo "... src/main_hss.i"
+	@echo "... src/main_hss.s"
 .PHONY : help
 
 

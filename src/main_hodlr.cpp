@@ -36,8 +36,8 @@ double calc_rel_error(const Matrix& ref, const Matrix& res) {
 
 int main() {
     int N = 4096;          
-    int leaf_size = 256;   
-    double tol = 1e-6;     
+    int leaf_size = 256 * 2;   
+    double tol = 1e-8;     
     
     std::cout << "==========================================================" << std::endl;
     std::cout << " HODLR Final Benchmark: Serial vs Parallel" << std::endl;

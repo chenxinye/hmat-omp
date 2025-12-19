@@ -69,28 +69,28 @@ include CMakeFiles/hodlr_test.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/hodlr_test.dir/flags.make
 
-CMakeFiles/hodlr_test.dir/src/main.cpp.o: CMakeFiles/hodlr_test.dir/flags.make
-CMakeFiles/hodlr_test.dir/src/main.cpp.o: /Users/chenxinye/hss/src/main.cpp
-CMakeFiles/hodlr_test.dir/src/main.cpp.o: CMakeFiles/hodlr_test.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/chenxinye/hss/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/hodlr_test.dir/src/main.cpp.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/hodlr_test.dir/src/main.cpp.o -MF CMakeFiles/hodlr_test.dir/src/main.cpp.o.d -o CMakeFiles/hodlr_test.dir/src/main.cpp.o -c /Users/chenxinye/hss/src/main.cpp
+CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.o: CMakeFiles/hodlr_test.dir/flags.make
+CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.o: /Users/chenxinye/hss/src/main_hodlr.cpp
+CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.o: CMakeFiles/hodlr_test.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/chenxinye/hss/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.o -MF CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.o.d -o CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.o -c /Users/chenxinye/hss/src/main_hodlr.cpp
 
-CMakeFiles/hodlr_test.dir/src/main.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/hodlr_test.dir/src/main.cpp.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/chenxinye/hss/src/main.cpp > CMakeFiles/hodlr_test.dir/src/main.cpp.i
+CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.i"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/chenxinye/hss/src/main_hodlr.cpp > CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.i
 
-CMakeFiles/hodlr_test.dir/src/main.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/hodlr_test.dir/src/main.cpp.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/chenxinye/hss/src/main.cpp -o CMakeFiles/hodlr_test.dir/src/main.cpp.s
+CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.s"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/chenxinye/hss/src/main_hodlr.cpp -o CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.s
 
 # Object files for target hodlr_test
 hodlr_test_OBJECTS = \
-"CMakeFiles/hodlr_test.dir/src/main.cpp.o"
+"CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.o"
 
 # External object files for target hodlr_test
 hodlr_test_EXTERNAL_OBJECTS =
 
-hodlr_test: CMakeFiles/hodlr_test.dir/src/main.cpp.o
+hodlr_test: CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.o
 hodlr_test: CMakeFiles/hodlr_test.dir/build.make
 hodlr_test: /opt/homebrew/opt/llvm/lib/libomp.dylib
 hodlr_test: CMakeFiles/hodlr_test.dir/link.txt

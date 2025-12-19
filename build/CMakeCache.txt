@@ -218,7 +218,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=HSS_Benchmark
+CMAKE_PROJECT_NAME:STATIC=HSS_HODLR_Benchmark
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib
@@ -286,13 +286,13 @@ CMAKE_TAPI:FILEPATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeD
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
 //Value Computed by CMake
-HSS_Benchmark_BINARY_DIR:STATIC=/Users/chenxinye/hss/build
+HSS_HODLR_Benchmark_BINARY_DIR:STATIC=/Users/chenxinye/hss/build
 
 //Value Computed by CMake
-HSS_Benchmark_IS_TOP_LEVEL:STATIC=ON
+HSS_HODLR_Benchmark_IS_TOP_LEVEL:STATIC=ON
 
 //Value Computed by CMake
-HSS_Benchmark_SOURCE_DIR:STATIC=/Users/chenxinye/hss
+HSS_HODLR_Benchmark_SOURCE_DIR:STATIC=/Users/chenxinye/hss
 
 //CXX compiler flags for OpenMP parallelization
 OpenMP_CXX_FLAGS:STRING=-Xclang -fopenmp

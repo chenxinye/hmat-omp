@@ -3,3 +3,4 @@ mkdir build && cd build
 cmake -DCMAKE_PREFIX_PATH=/opt/homebrew/opt/libomp ..
 make
 ./hodlr_test
+./hss_test

@@ -28,4 +28,33 @@ struct HODLRNode {
     HODLRNode() : is_leaf(false) {}
 };
 
+
+struct HSSNode {
+    int id;
+    int idx_start, idx_end;
+    bool is_leaf;
+    
+    HSSNode *left = nullptr;
+    HSSNode *right = nullptr;
+    HSSNode *parent = nullptr;
+
+    // 显式记录秩 (处理非对称秩的关键)
+    int rank_U = 0; 
+    int rank_V = 0;
+
+    Matrix D; // 对角块
+
+    // 叶子基底
+    Matrix U; 
+    Matrix V; 
+
+    // 内部转移矩阵
+    Matrix R; 
+    Matrix W; 
+
+    // 耦合矩阵
+    Matrix B; 
+
+    HSSNode() : is_leaf(false) {}
+};
 #endif

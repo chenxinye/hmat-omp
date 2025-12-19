@@ -7,33 +7,24 @@
 #include <cstring>
 #include <algorithm>
 #include <cassert>
+#include <random> // 必须引入，用于线程安全随机数
 
-//  LAPACK / BLAS C Interface Definitions 
+// --- LAPACK / BLAS C Interface ---
 extern "C" {
-    // BLAS
     void dgemm_(const char* transa, const char* transb, const int* m, const int* n, const int* k,
                 const double* alpha, const double* A, const int* lda,
                 const double* B, const int* ldb, const double* beta,
                 double* C, const int* ldc);
 
-    // LAPACK SVD / QR
     void dgesvd_(const char* jobu, const char* jobvt, const int* m, const int* n, double* a, const int* lda,
                  double* s, double* u, const int* ldu, double* vt, const int* ldvt,
                  double* work, const int* lwork, int* info);
     
-    // LAPACK LU
     void dgetrf_(const int* m, const int* n, double* a, const int* lda, int* ipiv, int* info);
     void dgetrs_(const char* trans, const int* n, const int* nrhs, const double* a, const int* lda, const int* ipiv, double* b, const int* ldb, int* info);
-    
-    // LAPACK Inverse (using LU)
     void dgetri_(const int* n, double* a, const int* lda, const int* ipiv, double* work, const int* lwork, int* info);
-
-    // LAPACK Cholesky
-    void dpotrf_(const char* uplo, const int* n, double* a, const int* lda, int* info);
-    void dpotrs_(const char* uplo, const int* n, const int* nrhs, const double* a, const int* lda, double* b, const int* ldb, int* info);
 }
 
-//  Lightweight Matrix Class 
 class Matrix {
 public:
     int rows_, cols_;
@@ -42,7 +33,6 @@ public:
     Matrix() : rows_(0), cols_(0) {}
     Matrix(int r, int c) : rows_(r), cols_(c), data_(r * c, 0.0) {}
 
-    // Accessors
     double& operator()(int i, int j) { return data_[j * rows_ + i]; }
     const double& operator()(int i, int j) const { return data_[j * rows_ + i]; }
 
@@ -53,9 +43,18 @@ public:
 
     void setZero() { std::fill(data_.begin(), data_.end(), 0.0); }
     
+    static Matrix Zero(int r, int c) {
+        return Matrix(r, c);
+    }
+
+    // --- FIX: 线程安全的随机生成器 ---
     static Matrix Random(int r, int c) {
         Matrix M(r, c);
-        for(auto& val : M.data_) val = (double)rand() / RAND_MAX;
+        // 使用 thread_local 避免 OpenMP 竞争条件
+        static thread_local std::mt19937 generator(std::random_device{}());
+        std::uniform_real_distribution<double> distribution(0.0, 1.0);
+        
+        for(auto& val : M.data_) val = distribution(generator);
         return M;
     }
 
@@ -106,6 +105,20 @@ public:
         return C;
     }
 
+    Matrix operator+(const Matrix& B) const {
+        assert(rows_ == B.rows_ && cols_ == B.cols_);
+        Matrix C(rows_, cols_);
+        for(size_t i=0; i<data_.size(); ++i) C.data_[i] = data_[i] + B.data_[i];
+        return C;
+    }
+
+    Matrix operator-(const Matrix& B) const {
+        assert(rows_ == B.rows_ && cols_ == B.cols_);
+        Matrix C(rows_, cols_);
+        for(size_t i=0; i<data_.size(); ++i) C.data_[i] = data_[i] - B.data_[i];
+        return C;
+    }
+
     void solve_lu(Matrix& b) {
         assert(rows_ == cols_);
         assert(rows_ == b.rows_);
@@ -118,20 +131,15 @@ public:
         dgetrf_(&n, &n, data_.data(), &lda, ipiv.data(), &info);
         dgetrs_(&trans, &n, &nrhs, data_.data(), &lda, ipiv.data(), b.data(), &ldb, &info);
     }
-
-    //  Inverse Method 
+    
     Matrix inverse() const {
         assert(rows_ == cols_);
         int n = rows_;
-        Matrix Inv = *this; // Copy
+        Matrix Inv = *this;
         int lda = n, info;
         std::vector<int> ipiv(n);
-        
-        // 1. LU Factorization
         dgetrf_(&n, &n, Inv.data(), &lda, ipiv.data(), &info);
         
-        // 2. Invert using LU factors
-        // Query workspace
         double work_query;
         int lwork = -1;
         dgetri_(&n, Inv.data(), &lda, ipiv.data(), &work_query, &lwork, &info);
@@ -139,7 +147,6 @@ public:
         lwork = (int)work_query;
         std::vector<double> work(lwork);
         dgetri_(&n, Inv.data(), &lda, ipiv.data(), work.data(), &lwork, &info);
-        
         return Inv;
     }
 };

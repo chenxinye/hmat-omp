@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/hodlr_test.dir/src/main.cpp.o"
-  "CMakeFiles/hodlr_test.dir/src/main.cpp.o.d"
+  "CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.o"
+  "CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.o.d"
   "hodlr_test"
   "hodlr_test.pdb"
 )

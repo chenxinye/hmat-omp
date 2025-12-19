@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/Users/chenxinye/hss/src/main_hodlr.cpp" "CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.o" "gcc" "CMakeFiles/hodlr_test.dir/src/main_hodlr.cpp.o.d"
+  "/Users/chenxinye/hss/src/main_hss.cpp" "CMakeFiles/hss_test.dir/src/main_hss.cpp.o" "gcc" "CMakeFiles/hss_test.dir/src/main_hss.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

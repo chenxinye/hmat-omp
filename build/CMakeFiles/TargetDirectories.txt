@@ -1,3 +1,4 @@
 /Users/chenxinye/hss/build/CMakeFiles/hodlr_test.dir
+/Users/chenxinye/hss/build/CMakeFiles/hss_test.dir
 /Users/chenxinye/hss/build/CMakeFiles/edit_cache.dir
 /Users/chenxinye/hss/build/CMakeFiles/rebuild_cache.dir
